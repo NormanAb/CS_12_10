@@ -45,6 +45,8 @@ public class AlgorithmController {
     private final AlgorithmLibrary library = new AlgorithmLibrary();
     private final List<String> data = new ArrayList<>();
 
+    @FXML
+    private static boolean foundFile = false;
 
     @FXML
     private void initialize(){
@@ -66,33 +68,32 @@ public class AlgorithmController {
     }
 
     @FXML
-    public void loadData() { //take in data from a csv file
-        String temp;
-
+    public void loadData() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open data to sort");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("text files", "*.csv"));
+        fileChooser.setTitle("Open Data to Sort");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
         File file = fileChooser.showOpenDialog(tableView.getScene().getWindow());
 
         if (file != null) {
+
             data.clear();
 
-            if (file.length() ==0) {
+            if (file.length() == 0) {
                 AlertMessage.showAlert("incorrect data");
+                return;
             }
 
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    data.add(line.trim());
-                    System.out.println(line);
+                    line = line.trim();
+                    data.add(line); // Add to the raw data list
+                    foundFile = true;
                 }
             } catch (FileNotFoundException e) {
                 AlertMessage.showAlert("file missing");
-                throw new RuntimeException(e);
             } catch (IOException e) {
                 AlertMessage.showAlert("incorrect data");
-                throw new RuntimeException(e);
             }
         }
     }
@@ -102,57 +103,68 @@ public class AlgorithmController {
 
     @FXML
     protected void runHandle() { //Run the algorithm with the data loaded, check if data is loaded in or not
-        String selectedAlgorithm = (String) algorithmBox.getValue(); //?
+        String selectedAlgorithm = (String) algorithmBox.getValue();
 
-        if (selectedAlgorithm != null) { //check and activate an algorithm
+        if (selectedAlgorithm != null && foundFile) { //check and activate an algorithm
 
             List<String> inputData = new ArrayList<>(data);
-            List<String> outputData = new ArrayList<>(data); //Change outputData with algorithm selected
+            List<String> outputData = new ArrayList<>();
 
-            long startTime = System.currentTimeMillis();
+            System.gc();
             long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            long startTime = System.nanoTime();
 
             switch (selectedAlgorithm) {
                 case "BubbleSort":
-                    library.bubbleSort(outputData, outputData.size());
+                    outputData = library.bubbleSort(inputData);
                     break;
                 case "HeapSort":
-                    library.heapSort(outputData);
+                    outputData = library.heapSort(inputData);
                     break;
                 case "QuickSort":
-                    library.quickSort(outputData);
+                    outputData = library.quickSort(inputData);
                     break;
                 case "InsertionSort":
-                    library.insertionSort(outputData);
+                    outputData = library.insertionSort(inputData);
                     break;
                 case "SelectionSort":
-                    library.selectionSort(outputData);
+                    outputData = library.selectionSort(inputData);
                     break;
                 case "MergeSort":
-                    library.mergeSort(outputData);
+                    outputData = library.mergeSort(inputData);
                     break;
+                default:
+                    AlertMessage.showAlert("No algorithm selected");
+                    return;
             }
 
-            //??????????
-
+            // Baigiam matuot
             long endMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-            long endTime = System.currentTimeMillis();
+            long endTime = System.nanoTime();
 
+            // Skaičiuojam laika ir atminti
             long memoryUsed = endMemory - startMemory;
-            long timeTaken = endTime - startTime;
+            long timeTaken = (endTime - startTime); // Laikas nanosekundėmis
 
+            System.out.println("Atmintis:" + memoryUsed);
+            System.out.println("Laikas:" + timeTaken);
+            // Įrašome rezultatą
             algorithmData.add(new AlgorithmData(selectedAlgorithm, timeTaken, memoryUsed));
 
-            inputOutputData.clear(); //reset table after iteration
+
+            inputOutputData.clear(); // Išvalome seną informaciją
 
             for (int i = 0; i < inputData.size(); i++) {
                 String inputRow = inputData.get(i);
                 String outputRow = i < outputData.size() ? outputData.get(i) : "";
                 inputOutputData.add(new InputOutputData(inputRow, outputRow));
             }
+
+            tableView1.refresh();
+
+        } else if (!foundFile) {
+            AlertMessage.showAlert("file missing");
         }
-        else {
-            AlertMessage.showAlert("no algorithm selected");
-        }
+        else AlertMessage.showAlert("no algorithm");
     }
 }
