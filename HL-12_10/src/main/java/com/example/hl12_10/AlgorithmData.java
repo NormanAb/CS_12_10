@@ -1,25 +1,40 @@
 package com.example.hl12_10;
 
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class AlgorithmData {
-    private String name;
-    private Double timeTaken;
-    private Double memoryTaken;
+    private final SimpleStringProperty type;
+    private final SimpleLongProperty timeTaken;
+    private final SimpleLongProperty memoryTaken;
 
-    public AlgorithmData(String name, Double timeTaken, Double memoryTaken, String[] input, String[] output) {
-        this.name = name;
-        this.timeTaken = timeTaken;
-        this.memoryTaken = memoryTaken;
+    public AlgorithmData(String name, long timeTaken, long memoryTaken) {
+        this.type = new SimpleStringProperty(name);
+        this.timeTaken = new SimpleLongProperty(timeTaken);
+        this.memoryTaken = new SimpleLongProperty(memoryTaken);
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type.get();
     }
 
-    public Double getTimeTaken() {
+    public SimpleStringProperty typeProperty() {
+        return type;
+    }
+
+    public long getTimeTaken() {
+        return timeTaken.get();
+    }
+
+    public SimpleLongProperty timeTakenProperty() {
         return timeTaken;
     }
 
-    public Double getMemoryTaken() {
+    public long getMemoryTaken() {
+        return memoryTaken.get();
+    }
+
+    public SimpleLongProperty memoryTakenProperty() {
         return memoryTaken;
     }
 }

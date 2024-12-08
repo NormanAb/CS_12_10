@@ -14,9 +14,11 @@ public class AlertMessage {
                 alert.setTitle("Error");
                 alert.setHeaderText("Make sure your file is correct!");
                 Optional<ButtonType> result = alert.showAndWait();
+                break;
             case "file missing":
                 alert.setTitle("Warning");
                 alert.setHeaderText("You have not selected a file!");
+                break;
         }
 
     }

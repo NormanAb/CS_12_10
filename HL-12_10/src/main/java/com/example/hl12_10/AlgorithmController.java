@@ -1,6 +1,7 @@
 package com.example.hl12_10;
 
 import Utilities.AlertMessage;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -40,20 +41,25 @@ public class AlgorithmController {
 
 
     private final ObservableList<AlgorithmData> algorithmData = FXCollections.observableArrayList();
+    private final ObservableList<InputOutputData> inputOutputData = FXCollections.observableArrayList();
     private final AlgorithmLibrary library = new AlgorithmLibrary();
     private final List<String> data = new ArrayList<>();
 
 
     @FXML
     private void initialize(){
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
-        memoryColumn.setCellValueFactory(new PropertyValueFactory<>("memory"));
-        inputColumn.setCellValueFactory(new PropertyValueFactory<>("input"));
-        outputColumn.setCellValueFactory(new PropertyValueFactory<>("output"));
+        algorithmBox.setItems(FXCollections.observableArrayList("BubbleSort", "HeapSort", "QuickSort", "InsertionSort", "SelectionSort", "MergeSort"));
 
+
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        timeColumn.setCellValueFactory(new PropertyValueFactory<>("timeTaken"));
+        memoryColumn.setCellValueFactory(new PropertyValueFactory<>("memoryTaken"));
         tableView.setItems(algorithmData);
-        tableView.setItems((ObservableList) data); //do this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+        inputColumn.setCellValueFactory(new PropertyValueFactory<>("inputData"));
+        outputColumn.setCellValueFactory(new PropertyValueFactory<>("outputData"));
+        tableView1.setItems(inputOutputData);
 
         loadFileButton.setOnAction(event -> loadData());
         runButton.setOnAction(event -> runHandle());
@@ -96,32 +102,57 @@ public class AlgorithmController {
 
     @FXML
     protected void runHandle() { //Run the algorithm with the data loaded, check if data is loaded in or not
-        String selectedAlgorithm = algorithmBox.getId(); //?
+        String selectedAlgorithm = (String) algorithmBox.getValue(); //?
 
         if (selectedAlgorithm != null) { //check and activate an algorithm
+
+            List<String> inputData = new ArrayList<>(data);
+            List<String> outputData = new ArrayList<>(data); //Change outputData with algorithm selected
+
+            long startTime = System.currentTimeMillis();
+            long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
             switch (selectedAlgorithm) {
                 case "BubbleSort":
-                    library.bubbleSort(data, data.size());
+                    library.bubbleSort(outputData, outputData.size());
                     break;
                 case "HeapSort":
-                    library.heapSort();
+                    library.heapSort(outputData);
                     break;
                 case "QuickSort":
-                    library.quickSort();
+                    library.quickSort(outputData);
                     break;
                 case "InsertionSort":
-                    library.insertionSort();
+                    library.insertionSort(outputData);
                     break;
                 case "SelectionSort":
-                    library.selectionSort();
+                    library.selectionSort(outputData);
                     break;
                 case "MergeSort":
-                    library.mergeSort();
+                    library.mergeSort(outputData);
                     break;
             }
-        }
 
+            //??????????
+
+            long endMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            long endTime = System.currentTimeMillis();
+
+            long memoryUsed = endMemory - startMemory;
+            long timeTaken = endTime - startTime;
+
+            algorithmData.add(new AlgorithmData(selectedAlgorithm, timeTaken, memoryUsed));
+
+            inputOutputData.clear(); //reset table after iteration
+
+            for (int i = 0; i < inputData.size(); i++) {
+                String inputRow = inputData.get(i);
+                String outputRow = i < outputData.size() ? outputData.get(i) : "";
+                inputOutputData.add(new InputOutputData(inputRow, outputRow));
+            }
+        }
         else {
+            AlertMessage.showAlert("no algorithm selected");
         }
     }
 }
