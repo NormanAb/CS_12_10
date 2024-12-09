@@ -6,39 +6,27 @@ import java.util.List;
 
 public class AlgorithmLibrary {
 
+    // Bubble Sort
     public List<String> bubbleSort(List<String> arr) {
         List<String> sortedArr = new ArrayList<>(arr); // Create a copy to sort
         int n = sortedArr.size();
-        System.out.println("Initial input: " + sortedArr);  // Print the initial input
 
         for (int i = 0; i < n - 1; i++) {
-            System.out.println("Iteration " + (i + 1) + " - Start: " + sortedArr);  // Print list before this iteration
-
             for (int j = 0; j < n - i - 1; j++) {
-                // Print out the current pair being compared
-                System.out.println("Comparing: " + sortedArr.get(j) + " and " + sortedArr.get(j + 1));
-
-                // Parse both strings to integers
+                // Parse both strings to integers for comparison
                 int num1 = Integer.parseInt(sortedArr.get(j).trim());
                 int num2 = Integer.parseInt(sortedArr.get(j + 1).trim());
 
-                System.out.println("Parsed values: " + num1 + " and " + num2);  // Debugging parsed values
-
                 // If the current element is greater than the next, swap them
                 if (num1 > num2) {
-                    System.out.println("Swapping: " + sortedArr.get(j) + " and " + sortedArr.get(j + 1));
                     Collections.swap(sortedArr, j, j + 1);
                 }
             }
-            System.out.println("Iteration " + (i + 1) + " - End: " + sortedArr);  // Print list after this iteration
         }
-
-        System.out.println("Sorted result: " + sortedArr);  // Print sorted list
         return sortedArr;
     }
 
-
-
+    // Merge Sort
     public List<String> mergeSort(List<String> arr) {
         if (arr.size() < 2) return new ArrayList<>(arr); // Return a copy of the single-element array
 
@@ -54,7 +42,10 @@ public class AlgorithmLibrary {
         int i = 0, j = 0;
 
         while (i < left.size() && j < right.size()) {
-            if (left.get(i).compareTo(right.get(j)) <= 0) {
+            int num1 = Integer.parseInt(left.get(i));
+            int num2 = Integer.parseInt(right.get(j));
+
+            if (num1 <= num2) {
                 merged.add(left.get(i++));
             } else {
                 merged.add(right.get(j++));
@@ -66,6 +57,7 @@ public class AlgorithmLibrary {
         return merged;
     }
 
+    // Quick Sort
     public List<String> quickSort(List<String> arr) {
         List<String> sortedArr = new ArrayList<>(arr);
         quickSortHelper(sortedArr, 0, sortedArr.size() - 1);
@@ -81,10 +73,12 @@ public class AlgorithmLibrary {
     }
 
     private int partition(List<String> arr, int low, int high) {
-        String pivot = arr.get(high);
+        int pivot = Integer.parseInt(arr.get(high));
         int i = low - 1;
+
         for (int j = low; j < high; j++) {
-            if (arr.get(j).compareTo(pivot) <= 0) {
+            int current = Integer.parseInt(arr.get(j));
+            if (current <= pivot) {
                 i++;
                 Collections.swap(arr, i, j);
             }
@@ -93,12 +87,15 @@ public class AlgorithmLibrary {
         return i + 1;
     }
 
+    // Insertion Sort
     public List<String> insertionSort(List<String> arr) {
         List<String> sortedArr = new ArrayList<>(arr);
         for (int i = 1; i < sortedArr.size(); i++) {
             String key = sortedArr.get(i);
+            int keyNum = Integer.parseInt(key); // Parse key to integer
             int j = i - 1;
-            while (j >= 0 && sortedArr.get(j).compareTo(key) > 0) {
+
+            while (j >= 0 && Integer.parseInt(sortedArr.get(j)) > keyNum) {
                 sortedArr.set(j + 1, sortedArr.get(j));
                 j--;
             }
@@ -107,12 +104,13 @@ public class AlgorithmLibrary {
         return sortedArr;
     }
 
+    // Selection Sort
     public List<String> selectionSort(List<String> arr) {
         List<String> sortedArr = new ArrayList<>(arr);
         for (int i = 0; i < sortedArr.size() - 1; i++) {
             int minIndex = i;
             for (int j = i + 1; j < sortedArr.size(); j++) {
-                if (sortedArr.get(j).compareTo(sortedArr.get(minIndex)) < 0) {
+                if (Integer.parseInt(sortedArr.get(j)) < Integer.parseInt(sortedArr.get(minIndex))) {
                     minIndex = j;
                 }
             }
@@ -121,6 +119,7 @@ public class AlgorithmLibrary {
         return sortedArr;
     }
 
+    // Heap Sort
     public List<String> heapSort(List<String> arr) {
         List<String> sortedArr = new ArrayList<>(arr);
         int n = sortedArr.size();
@@ -139,8 +138,8 @@ public class AlgorithmLibrary {
         int left = 2 * i + 1;
         int right = 2 * i + 2;
 
-        if (left < n && arr.get(left).compareTo(arr.get(largest)) > 0) largest = left;
-        if (right < n && arr.get(right).compareTo(arr.get(largest)) > 0) largest = right;
+        if (left < n && Integer.parseInt(arr.get(left)) > Integer.parseInt(arr.get(largest))) largest = left;
+        if (right < n && Integer.parseInt(arr.get(right)) > Integer.parseInt(arr.get(largest))) largest = right;
 
         if (largest != i) {
             Collections.swap(arr, i, largest);

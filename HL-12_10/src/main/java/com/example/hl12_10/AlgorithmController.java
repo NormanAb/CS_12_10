@@ -45,7 +45,7 @@ public class AlgorithmController {
     private final AlgorithmLibrary library = new AlgorithmLibrary();
     private final List<String> data = new ArrayList<>();
 
-    @FXML
+    @FXML //error checking
     private static boolean foundFile = false;
 
     @FXML
@@ -79,7 +79,7 @@ public class AlgorithmController {
             data.clear();
 
             if (file.length() == 0) {
-                AlertMessage.showAlert("incorrect data");
+                AlertMessage.showAlert("no data");
                 return;
             }
 
@@ -87,14 +87,20 @@ public class AlgorithmController {
                 String line;
                 while ((line = br.readLine()) != null) {
                     line = line.trim();
-                    data.add(line); // Add to the raw data list
-                    foundFile = true;
+                    String[] values = line.split(","); // Split by commas
+                    for (String value : values) {
+                        data.add(value.trim()); // Add each value to the list
+                    }
                 }
             } catch (FileNotFoundException e) {
                 AlertMessage.showAlert("file missing");
             } catch (IOException e) {
                 AlertMessage.showAlert("incorrect data");
             }
+
+            System.out.println("Size of data: " + data.size());
+
+            foundFile = true;
         }
     }
 
@@ -107,8 +113,7 @@ public class AlgorithmController {
 
         if (selectedAlgorithm != null && foundFile) { //check and activate an algorithm
 
-            List<String> inputData = new ArrayList<>(data);
-            List<String> outputData = new ArrayList<>();
+            List<String> outputData;
 
             System.gc();
             long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -116,22 +121,22 @@ public class AlgorithmController {
 
             switch (selectedAlgorithm) {
                 case "BubbleSort":
-                    outputData = library.bubbleSort(inputData);
+                    outputData = library.bubbleSort(data);
                     break;
                 case "HeapSort":
-                    outputData = library.heapSort(inputData);
+                    outputData = library.heapSort(data);
                     break;
                 case "QuickSort":
-                    outputData = library.quickSort(inputData);
+                    outputData = library.quickSort(data);
                     break;
                 case "InsertionSort":
-                    outputData = library.insertionSort(inputData);
+                    outputData = library.insertionSort(data);
                     break;
                 case "SelectionSort":
-                    outputData = library.selectionSort(inputData);
+                    outputData = library.selectionSort(data);
                     break;
                 case "MergeSort":
-                    outputData = library.mergeSort(inputData);
+                    outputData = library.mergeSort(data);
                     break;
                 default:
                     AlertMessage.showAlert("No algorithm selected");
@@ -154,8 +159,8 @@ public class AlgorithmController {
 
             inputOutputData.clear(); // Išvalome seną informaciją
 
-            for (int i = 0; i < inputData.size(); i++) {
-                String inputRow = inputData.get(i);
+            for (int i = 0; i < data.size(); i++) { //~~! what is this doing exactly and how?
+                String inputRow = data.get(i);
                 String outputRow = i < outputData.size() ? outputData.get(i) : "";
                 inputOutputData.add(new InputOutputData(inputRow, outputRow));
             }
